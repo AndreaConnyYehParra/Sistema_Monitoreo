@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Monitoreo de Dispositivos{% endblock %}
+{% block content %}                    
+                    <!-- Page Heading -->
+                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <h1 class="h3 mb-2 text-secundario">Monitoreo de Dispositivos</h1>
+                    </div>
+
+                    <!-- Filtrar por Area -->
+                    <div class="d-flex align-items-center mb-4">
+                    <h6 class="m-0 font-weight-bold text-primary">Dispositivos por ubicación: </h6> 
+                    <select class="custom-select custom-select-sm ml-2" style="width: auto;" aria-label="Small select example"  onchange="location.href='/monitoreo/dispositivos?ubicacion=' + this.value;">
+                    <option value="0" {% if ubicacion == 0 %}selected{% endif %}>Todos</option>
+                        {% for u in ubicaciones %}
+                        <option value="{{ u[0] }}"{% if ubicacion == u[0] %}selected{% endif %}>{{ u[1] }}</option>
+                        ubicacion={{ u[0] }}
+                        {% endfor %}
+                    </select>
+                    </div>
+                
+                    <div class="row">
+                    {% include 'cards.html' %}   
+                    </div>
+                   
+      {% endblock %}

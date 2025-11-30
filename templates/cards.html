@@ -1,0 +1,97 @@
+                    {% for d in dispositivos %}
+                    <div class="col-md-3 mb-4">
+                    <div class="card shadow h-100 py-2" style="width: 17rem;">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">{% if d[7] == 1 %}<i class="fas fa-circle fa-xs" style="color: #06db1e;"></i> {% else %} <i class="fas fa-circle fa-xs" style="color: #db1b06;"></i> {% endif %}{{ d[2] }}</h5>
+                        <p class="card-text">Dirección IP: {{ d[4] }}
+                            <br>Estado: {% if d[7] == 0 %}Crítico{% elif d[6] == 4 or d[5] > 150 %}<img src="/static/img/critico.png" alt="alertacritica" width="15" class="rounded-circle"> Critico{% elif 1 <= d[6] <= 3  or 80 < d[5] <= 150 %}<img src="/static/img/advertencia.png" alt="Advertencia" width="15" class="rounded-circle"> Advertencia{% else %}<img src="/static/img/estable.png" alt="estable" width="15" class="rounded-circle"> Funcionando correctamente{% endif %} 
+                            <br>Latencia: {{ d[5] }} ms
+                            <br>Perdida de paquetes: {{ d[6] }}
+                            <br>Ultimo monitoreo: {{ d[8] }}
+                        </p>
+                        <a href="#" class="btn btn-sm btn-primary text" data-toggle="modal" data-target="#modalverDispositivo{{ d[0] }}">Ver detalles</a>
+                    </div>
+                    </div>
+                    </div>
+                  {% endfor %}
+
+                  {% for d in dispositivos %}
+            <div class="modal fade" id="modalverDispositivo{{ d[0] }}" tabindex="-1" role="dialog" aria-labelledby="modalverLabel{{ d[0] }}" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+
+                        <div class="modal-header">
+                            <h5 class="modal-title text-primary text-center w-100">{% if d[7] == 1 %}<i class="fas fa-circle fa-xs" style="color: #06db1e;"></i> {% else %} <i class="fas fa-circle fa-xs" style="color: #db1b06;"></i> {% endif %}{{ d[2] }}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="modal-body p-modal">
+
+                    <input type="hidden" id="id" name="id" value="{{ d[0] }}">
+
+                      <div class="d-flex">
+                        <label class="text-primary" for="ip"><i class="fas fa-clock" style="color: #1f8fe5;"></i> Ultimo monitoreo: </label>
+                        <p class="form-control-static pdis">{{ d[8] }}</p>
+                    </div>
+
+                    <div class="d-flex">
+                        <label class="text-labels" for="macadd">Nombre del dispositivo: </label>
+                        <p class="form-control-static pdis">{{ d[2] }}</p>
+                    </div>
+
+                    <div class="d-flex">
+                        <label class="text-labels" for="macadd">Mac Address: </label>
+                        <p class="form-control-static pdis">{{ d[3] }}</p>
+                    </div>
+
+                    <div class="d-flex">
+                        <label class="text-labels" for="ip">IP: </label>
+                        <p class="form-control-static pdis">{{ d[4] }}</p>
+                    </div>
+
+                    <div class="">
+                        <label for="ip" class="text-primary"> {% if d[7] == 0 %}<i class="fas fa-times-circle" style="color: #f00000;"></i>{% elif d[6] == 4 or d[5] > 150 %}<i class="fas fa-times-circle" style="color: #f00000;"></i>{% elif 1 <= d[6] <= 3  or 80 < d[5] <= 150 %} <i class="fas fa-exclamation-circle" style="color: #FFD43B;"></i>{% else %}<i class="fas fa-check-circle" style="color: #07bb4c;"></i></i>{% endif %} Estado de Salud </label>
+                    </div>
+
+                    <div class="d-flex">
+                        <label class="text-labels" for="ip">Latencia: </label>
+                        <p class="form-control-static pdis">{{ d[5] }} ms</p>
+                    </div>
+
+                    <div class="d-flex">
+                        <label class="text-labels" for="ip" class="me-2">Paquetes Perdidos: </label>
+                        <p class="form-control-static pdis">{{ d[6] }}</p>
+                    </div>
+
+                    <div class="d-flex">
+                        <label class="text-labels" for="ip">Disponibilidad: </label>
+                        <p class="form-control-static pdis">{% if d[7] == 1 %}Disponible{% else %}No disponible{% endif %}</p>
+                    </div>
+
+                    <div class="">
+                        <label for="ip" class="text-primary"> <i class="fas fa-clipboard-list" style="color: #1f8fe5;"></i> Ultimos Eventos </label>
+                         <ul class="list-group">
+                            {% for e in eventos[d[1]] %}
+                            <li class="list-group-item">
+                                <strong>{{ e[2] }}</strong> - {{ e[3] }} <br>
+                                <small class="text-muted">{{ e[4] }}</small>
+                            </li>
+                            {% else %}
+                            <li class="list-group-item text-muted">Sin eventos recientes</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+            
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+{% endfor %}
+            

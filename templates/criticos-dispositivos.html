@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Dispositivos Criticos{% endblock %}
+{% block content %}                    
+                    <!-- Page Heading -->
+                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <h1 class="h3 mb-2 text-secundario">Dispositivos Criticos</h1>
+                    </div>
+                     <div class="d-flex justify-content-end mb-3">
+                    <a href="/eliminar/eventos" class="btn btn-danger btn-sm">
+                        <i class="fas fa-trash-alt"></i> Eliminar Todos
+                    </a>
+                    </div>
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show mt-2" role="alert">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                        {% endwith %}
+
+                    {% for e in ueventos %}
+                    <!-- Tarjetas de eventos -->
+                   <div class="row">
+                   <div class="col-12 mb-2">
+                   <div class="card shadow h-100 py-2">
+                     <a href="/eliminar/evento/{{ e[0] }}" class="position-absolute" style="top: 20px; right: 40px;">
+    <i class="fas fa-trash-alt" style="color: #c10606;"></i>
+  </a>
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div class="text-left">
+                        
+                        <h6 class="m-0 font-weight-bold text-primary">{{ e[2] }}</h6> 
+                        <p class="card-text">Fecha: {{ e[8] }}
+                        <br>{{ e[7] }}
+                        <br>Ubicación: {{ e[5] }}
+                        </p>
+                        </div>
+                    </div>
+                    
+                    </div>
+                    </div>
+                    </div>
+{% endfor %}
+
+                    
+
+      {% endblock %}

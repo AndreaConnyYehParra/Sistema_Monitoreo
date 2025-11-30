@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title %}Administrador de Dispositivos{% endblock %}
+{% block content %}     
+            
+                    <!-- Page Heading -->
+                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <h1 class="h3 mb-2 text-secundario">Administrador de Dispositivos</h1>
+                     <a href="#" class="btn btn-sm btn-primary shadow-sm" data-toggle="modal" data-target="#modalAgregarDispositivo">
+                    <i class="fas fa-plus fa-sm text-white-50"></i> Agregar Dispositivo
+                    </a>
+                    </div>
+
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show mt-2" role="alert">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                        {% endwith %}
+
+                    <div class="card shadow mb-4">
+                    {% include 'tables.html' %}
+                    </div>
+                    
+                    <!-- Modal -->
+            <div class="modal fade" id="modalAgregarDispositivo" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Agregar Dispositivo</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                
+                <form method="POST" action="/agregar-dispositivo" enctype="multipart/form-data">
+                    <div class="modal-body">
+                    <div class="form-group">
+                        <label for="nombre">Nombre del dispositivo</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="macadd">Mac Address</label>
+                        <input type="text" class="form-control" id="macadd" name="macadd" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ip">IP</label>
+                        <input type="text" class="form-control" id="ip" name="ip" required>
+                    </div>
+
+
+                   <div class="form-group">
+                        <label for="tipo">Tipo</label>
+                        <select class="form-control" id="tipo" name="tipo">
+                        {% for t in tipos %}
+                        <option value="{{ t[0] }}">{{ t[1] }}</option>
+                        {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tipo">Ubicación</label>
+                        <select class=" form-control" id="ubicacion" name="ubicacion">
+                        {% for u in ubicaciones %}
+                        <option value="{{ u[0] }}">{{ u[1] }}</option>
+                        {% endfor %}
+                        </select>
+                    </div>
+                                       
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+                
+                </div>
+            </div>
+            </div>
+      {% endblock %}
+
+ <script>
+  setTimeout(function() {
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+      alert.classList.remove('show');
+      alert.classList.add('fade');
+      setTimeout(() => alert.remove(), 500); // Se elimina del DOM
+    });
+  }, 3000); // 3 segundos
+</script>

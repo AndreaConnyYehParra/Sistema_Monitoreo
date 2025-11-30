@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+{% include 'header.html' %}
+<title>{% block title %}{% endblock %}</title>
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+    {% include 'sidebar.html' %}
+         <div id="content-wrapper" class="d-flex flex-column">
+            <!-- Main Content -->
+            <div id="content">
+{% include 'topbar.html' %}
+        <div class="container-fluid">
+          {% block content %}{% endblock %}
+        </div>
+                </div>
+            <!-- End of Main Content -->
+             {% include 'footer.html' %}
+              </div>
+
+  </div>
+   {% include 'messages.html' %}
+  </body>
+</html>
