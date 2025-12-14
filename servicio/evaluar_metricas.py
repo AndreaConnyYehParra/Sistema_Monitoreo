@@ -1,74 +1,90 @@
 from database.db_utils import insertar_evento
 
-def evaluar_metricas(conexion, id_dispositivo, fecha_ping, latencia, perdidos, disponible):
+def evaluar_latencia(latencia):
+        try: latencia = float(latencia)
+        except: 
+            return "Crítico"
+        
+        if latencia <50:
+            estado_latencia="Normal"
+        elif  50<= latencia <=100:
+            estado_latencia="Advertencia"
+        else: 
+            estado_latencia="Crítico"
+        return estado_latencia
+        
+def evaluar_paquetes(porcentaje):
+        try: perdidos = int(porcentaje)
+        except: 
+            return "Crítico"
+        
+        # Casos críticos según los 4 pings
+        if porcentaje == 25:
+         return "Advertencia"
     
-    #Convertir valor string a float o int
-    try: latencia = float(latencia)
-    except: latencia = None
+    # Caso saludable
+        if porcentaje == 0:
+         return "Normal"
 
-    try: perdidos = int(perdidos)
-    except: perdidos = 0
+    # Si viene algo inesperado, lo tratamos como crítico
+        return "Crítico"
+            
+def evaluar_disponibilidad(disponible):
+        try: disponible = int(disponible)
+        except: 
+            return "No disponible"
+        
+        if disponible == 1:
+            estado_disponibilidad="Disponible"
+        else: 
+            estado_disponibilidad="No disponible"
+        return estado_disponibilidad
 
-    try: disponible = int(disponible)
-    except: disponible = 0
+def evaluar_metricas(conexion, id_dispositivo, fecha_ping, latencia,  porcentaje, disponible):
 
-
-    if disponible == 0:
-        alerta = "Estado Crítico"
-        descripcion = "El dispositivo no responde (caída total)"
-        insertar_evento(conexion, id_dispositivo, alerta, descripcion, fecha_ping)
-        print("Evento → CRÍTICO por disponibilidad")
-        return "critico"
-
-
-    #Evaluación de latencia
-    estado_latencia = "normal"
-
-    if latencia is None:
-        estado_latencia = "desconocido"
-
-    elif latencia > 150:
-        estado_latencia = "critico"
-
-    elif 80 < latencia <= 150:
-        estado_latencia = "advertencia"
-
-    elif latencia <= 80:
-        estado_latencia = "normal"
-
-
-    #Evaluar perdida de paquetes
-    estado_perdida = "normal"
-
-    if perdidos == 4:
-        estado_perdida = "critico"
-    elif 1 <= perdidos <= 3:
-        estado_perdida = "advertencia"
-    elif perdidos == 0:
-        estado_perdida = "normal"
-
-     #Establece alertas
-
-    if estado_latencia == "critico" or estado_perdida == "critico":
+    latencia_estado=evaluar_latencia(latencia)
+    paquetes_estado=evaluar_paquetes(porcentaje)
+    disponibilidad_estado=evaluar_disponibilidad(disponible)
+    
+    #Prioridad 1: disponibilidad    
+    if disponibilidad_estado == "No disponible":
         estado_final = "critico"
         alerta = "Estado Crítico"
-        descripcion = f"Posible congestión en la red. Latencia: {latencia} ms, Perdidas de paquetes: {perdidos}%"
+        descripcion = f"El dispositivo no responde a las pruebas de conectividad."
+        insertar_evento(conexion, id_dispositivo, alerta, descripcion, fecha_ping)
+        print("Evento → NO DISPONIBLE")
+        return estado_final
+    
+    #Prioridad 2: estado critico
+    if  latencia_estado== "Crítico" or paquetes_estado == "Crítico": 
+        estado_final = "critico"
+        alerta = "Estado Crítico"
+        descripcion = f"Condición crítica detectada en el dispositivo. Posible congestión, falla de red o indisponibilidad. Latencia: {latencia} ms, Perdidas de paquetes: {porcentaje}%"
         insertar_evento(conexion, id_dispositivo, alerta, descripcion, fecha_ping)
         print("Evento → CRÍTICO")
         return estado_final
 
-    if estado_latencia == "advertencia" or estado_perdida == "advertencia":
+    #Prioridad 3: estado advertencia
+    elif  latencia_estado== "Advertencia" or paquetes_estado == "Advertencia":
         estado_final = "advertencia"
         alerta = "Advertencia"
-        descripcion = f"Bajo rendimiento en la red. Latencia: {latencia} ms, Perdidas: {perdidos}%"
+        descripcion = f"El dispositivo se encuentra operativo, pero presenta bajo rendimiento en la red. Latencia: {latencia} ms, Perdidas: {porcentaje}%"
         insertar_evento(conexion, id_dispositivo, alerta, descripcion, fecha_ping)
         print("Evento → ADVERTENCIA")
         return estado_final
-
+    
     # Si ninguna condicón se cumple, su estado es normal
-    estado_final = "normal"
-    alerta = "Estado Normal"
-    descripcion = f"El dispositivo se encuentra estable en la red. Latencia: {latencia} ms, Perdidas: {perdidos}%"
-    insertar_evento(conexion, id_dispositivo, alerta, descripcion, fecha_ping)
-    print("Evento → NORMAL")
-    return estado_final
+    else:
+     estado_final = "normal"
+     alerta = "Estado Normal"
+     descripcion = f"El dispositivo se encuentra estable en la red. Latencia: {latencia} ms, Perdidas: {porcentaje}%"
+     insertar_evento(conexion, id_dispositivo, alerta, descripcion, fecha_ping)
+     print("Evento → NORMAL")
+     return estado_final
+
+
+
+        
+        
+        
+    

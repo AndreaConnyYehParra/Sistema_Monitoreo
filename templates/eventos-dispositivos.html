@@ -5,45 +5,49 @@
                      <div class="d-sm-flex align-items-center justify-content-between mb-4">
                     <h1 class="h3 mb-2 text-secundario">Eventos de Dispositivos</h1>
                     </div>
-
+                     <div class="d-flex justify-content-end mb-3">
+                    <a href="/borrar/eventos" class="btn btn-danger btn-sm">
+                        <i class="fas fa-trash-alt"></i> Eliminar Todos
+                    </a>
+                    </div>
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show mt-2" role="alert">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                        {% endwith %}
+                     {% for eve in eventos %}
                     <!-- Tarjetas de eventos -->
                    <div class="row">
                    <div class="col-12 mb-2">
-                   <div class="card shadow">
-                    <div class="card-body">
-                        <h6 class="m-0 font-weight-bold text-primary">PC1</h6> 
-                        <p class="card-text">"Dispositivo desactivado"
-                        <br>Ubicación:
+                   <div class="card shadow h-100 py-2">
+                    <a href="/eliminar-evento/{{ eve[0] }}" class="position-absolute" style="top: 20px; right: 40px;">
+                        <i class="fas fa-trash-alt" style="color: #c10606;"></i>
+                    </a>
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div class="text-left">
+                        <h6 class="m-0 font-weight-bold text-primary">{% if eve[6] == "Estado Crítico" %}<i class="fas fa-times-circle" style="color: #f00000;"></i>{% elif eve[6] == "Advertencia" %}<i class="fas fa-exclamation-circle" style="color: #FFD43B;"></i>{% elif eve[6] == "Estado Normal" %}<i class="fas fa-check-circle" style="color: #07bb4c;"></i>{% endif %} {{ eve[2] }}</h6> 
+                        <p class="card-text">Fecha: {{ eve[8] }}
+                        <br>{{ eve[7] }}
+                        <br>Ubicación: {{ eve[5] }}
                         </p>
+                        </div>
                     </div>
                     </div>
                     </div>
-
-                    <div class="col-12 mb-2">
-                     <div class="card shadow">
-                    <div class="card-body">
-                        <h6 class="m-0 font-weight-bold text-primary">PC1</h6> 
-                        <p class="card-text">"Dispositivo desactivado"
-                        <br>Ubicación:
-                        </p>
                     </div>
-                    </div>
-                    </div>
-
-
-                    <div class="col-12 mb-2">
-                     <div class="card shadow">
-                    <div class="card-body">
-                        <h6 class="m-0 font-weight-bold text-primary">PC1</h6> 
-                        <p class="card-text">"Dispositivo desactivado"
-                        <br>Ubicación:
-                        </p>
-                    </div>
-                    </div>
-                    </div>
-
-                    </div>
-
-                    
+{% else %}
+                           <div class="d-flex justify-content-center align-items-center">
+                            <i class="fas fa-search fa-2x me-2" style="color: #5881a7ff;"> </i>
+                            <p class="fw-bold mb-0 mensaje_ne"> No se encontraron Eventos</p>    
+                        </div>
+                
+{% endfor %}
 
       {% endblock %}

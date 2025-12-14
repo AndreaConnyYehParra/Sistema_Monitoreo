@@ -4,9 +4,12 @@
                     <div class="card-body">
                         <h5 class="card-title text-primary">{% if d[7] == 1 %}<i class="fas fa-circle fa-xs" style="color: #06db1e;"></i> {% else %} <i class="fas fa-circle fa-xs" style="color: #db1b06;"></i> {% endif %}{{ d[2] }}</h5>
                         <p class="card-text">Dirección IP: {{ d[4] }}
-                            <br>Estado: {% if d[7] == 0 %}Crítico{% elif d[6] == 4 or d[5] > 150 %}<img src="/static/img/critico.png" alt="alertacritica" width="15" class="rounded-circle"> Critico{% elif 1 <= d[6] <= 3  or 80 < d[5] <= 150 %}<img src="/static/img/advertencia.png" alt="Advertencia" width="15" class="rounded-circle"> Advertencia{% else %}<img src="/static/img/estable.png" alt="estable" width="15" class="rounded-circle"> Funcionando correctamente{% endif %} 
+                            <br>Estado: {% if d[7] == 0 %}<i class="fas fa-times-circle" style="color: #f00000;"></i> Crítico
+                    {% elif d[6] >=50  or d[5] > 100 %}<i class="fas fa-times-circle" style="color: #f00000;"></i> Critico
+                    {% elif d[6] == 25  or (50 <= d[5] <= 100) %}<i class="fas fa-exclamation-circle" style="color: #FFD43B;"></i> Advertencia
+                    {% else %}<i class="fas fa-check-circle" style="color: #07bb4c;"></i></i> Funcionando correctamente{% endif %} 
                             <br>Latencia: {{ d[5] }} ms
-                            <br>Perdida de paquetes: {{ d[6] }}
+                            <br>Paquetes perdidos: {{ d[6] }} %
                             <br>Ultimo monitoreo: {{ d[8] }}
                         </p>
                         <a href="#" class="btn btn-sm btn-primary text" data-toggle="modal" data-target="#modalverDispositivo{{ d[0] }}">Ver detalles</a>
@@ -52,7 +55,12 @@
                     </div>
 
                     <div class="">
-                        <label for="ip" class="text-primary"> {% if d[7] == 0 %}<i class="fas fa-times-circle" style="color: #f00000;"></i>{% elif d[6] == 4 or d[5] > 150 %}<i class="fas fa-times-circle" style="color: #f00000;"></i>{% elif 1 <= d[6] <= 3  or 80 < d[5] <= 150 %} <i class="fas fa-exclamation-circle" style="color: #FFD43B;"></i>{% else %}<i class="fas fa-check-circle" style="color: #07bb4c;"></i></i>{% endif %} Estado de Salud </label>
+                        <label for="ip" class="text-primary"> 
+                    {% if d[7] == 0 %}<i class="fas fa-times-circle" style="color: #f00000;"></i>
+                    {% elif d[6] >=50  or d[5] > 100 %}<i class="fas fa-times-circle" style="color: #f00000;"></i>
+                    {% elif d[6] == 25  or (50 <= d[5] <= 100) %}<i class="fas fa-exclamation-circle" style="color: #FFD43B;"></i>
+                    {% else %}<i class="fas fa-check-circle" style="color: #07bb4c;"></i></i>{% endif %} 
+                         Estado de Salud </label>
                     </div>
 
                     <div class="d-flex">
@@ -62,7 +70,7 @@
 
                     <div class="d-flex">
                         <label class="text-labels" for="ip" class="me-2">Paquetes Perdidos: </label>
-                        <p class="form-control-static pdis">{{ d[6] }}</p>
+                        <p class="form-control-static pdis">{{ d[6] }} %</p>
                     </div>
 
                     <div class="d-flex">

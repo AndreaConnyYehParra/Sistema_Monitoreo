@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request, jsonify, redirect, flash, session
 from flask_mysqldb import MySQL
 from database.config import Config
-from  database.db_utils import obtener_tipos, obtener_ubicaciones, obtener_dispositivos, insertar_dispositivo, actualizar_dispositivo, eliminar_dispositivo, obtener_dispositivos_card, filtros, obtener_eventos, obtener_ultimos_eventos, obtener_dispositivos_criticos, eliminar_evento_db, eliminar_eventos
+from  database.db_utils import obtener_tipos, obtener_ubicaciones, obtener_dispositivos, insertar_dispositivo, actualizar_dispositivo, eliminar_dispositivo, obtener_dispositivos_card, filtros, obtener_eventos, obtener_ultimos_eventos, obtener_dispositivos_criticos, eliminar_evento_db, eliminar_eventos, obtener_todos_eventos,obtener_disponibilidad, obtener_umonitoreo, obtener_deventos, obtener_ndispositivos, obtener_disnormal, obtener_disadvertencia, obtener_discriticos
+from  servicio.evaluar_salud import evaluar_salud
+
 app=Flask(__name__)
 
 app.config['MYSQL_HOST'] = Config.MYSQL_HOST
@@ -15,8 +17,17 @@ app.secret_key = "890HJK"
 
 @app.route('/')
 def index():
-    
-    return render_template('index.html') 
+    ultimos_eventos=obtener_ultimos_eventos(conexion)
+    disponibilidad=obtener_disponibilidad(conexion)
+    umonitoreo=obtener_umonitoreo(conexion)
+    ultimo_deventos=obtener_deventos(conexion)
+    num_dispositivos = obtener_ndispositivos(conexion) 
+    dis_normal = obtener_disnormal(conexion)
+    dis_advertencia = obtener_disadvertencia(conexion)
+    dis_criticos = obtener_discriticos(conexion)
+    porcentaje_salud, salud_general = evaluar_salud(num_dispositivos, dis_criticos, dis_advertencia, dis_normal)
+    return render_template('index.html', ueventos=ultimos_eventos, disponibilidad=disponibilidad, umonitoreo=umonitoreo, ultimo_deventos=ultimo_deventos, porcentaje_salud=porcentaje_salud, salud_general=salud_general) 
+
 
 @app.route('/admin/dispositivos')
 def AdminDispositivos():
@@ -44,14 +55,15 @@ def MonitoreoDispositivos():
 
 @app.route('/eventos/dispositivos')
 def EventosDispositivos():
-    
-    return render_template('eventos-dispositivos.html')
+    eventos= obtener_todos_eventos(conexion) 
+    ultimos_eventos=obtener_ultimos_eventos(conexion)
+    return render_template('eventos-dispositivos.html', eventos=eventos, ueventos=ultimos_eventos)
 
 @app.route('/criticos/dispositivos')
 def CriticosDispositivos():
     dispositivos= obtener_dispositivos_criticos(conexion) 
-    ultimos_eventos=obtener_dispositivos_criticos(conexion)
-    return render_template('criticos-dispositivos.html', dispositivos=dispositivos, ueventos=ultimos_eventos)
+    ultimos_eventos=obtener_ultimos_eventos(conexion)
+    return render_template('criticos-dispositivos.html', dcriticos=dispositivos, ueventos=ultimos_eventos)
 
 @app.route('/agregar-dispositivo', methods=['POST'])
 def storage():
@@ -117,6 +129,26 @@ def eliminar_eventos_route():
     except Exception as ex:
         flash("Error al eliminar eventos", "danger")
         return redirect('/criticos/dispositivos')
+    
+@app.route('/eliminar-evento/<int:id>')
+def eliminar_evento(id):       
+    try: 
+        eliminar_evento_db(conexion,  id)
+        flash("Evento Eliminado Correctamente", "info")
+        return redirect('/eventos/dispositivos')
+    except Exception as ex:
+        flash("Error al eliminar el evento", "danger")
+        return redirect('/eventos/dispositivos')
+    
+@app.route('/borrar/eventos')
+def eliminar_todos_eventos():       
+    try: 
+        eliminar_eventos(conexion)
+        flash("Eventos Eliminados Correctamente", "info")
+        return redirect('/eventos/dispositivos')
+    except Exception as ex:
+        flash("Error al eliminar eventos", "danger")
+        return redirect('/eventos/dispositivos')
 
 if __name__=='__main__':
     app.run(debug=True)

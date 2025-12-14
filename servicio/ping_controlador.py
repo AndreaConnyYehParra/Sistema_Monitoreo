@@ -28,9 +28,10 @@ def ping(ip):
             if "Paquetes" in linea:
                 paquetes = linea.replace("Paquetes: ", "").split(",")
                 if len(paquetes) >= 3:
-                    enviados = paquetes[0].split("=")[1].strip()
-                    recibidos = paquetes[1].split("=")[1].strip()
-                    perdidos = paquetes[2].split("=")[1].strip()
+                    enviados = int(paquetes[0].split("=")[1].strip())
+                    recibidos = int(paquetes[1].split("=")[1].strip())
+                    perdidos = int(paquetes[2].split("=")[1].strip())
+                    porcentaje=(perdidos/enviados)*100
                     
             # Tiempos:
             if "Mínimo" in linea:
@@ -43,12 +44,12 @@ def ping(ip):
             fecha_ping = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             
         print(f"\nIP: {ip}")
-        print(f"Paquetes → Enviados: {enviados} | Recibidos: {recibidos}| Perdidos: {perdidos}")
+        print(f"Paquetes → Enviados: {enviados} | Recibidos: {recibidos}| Perdidos: {perdidos} | porcentaje {porcentaje} ")
         print(f"Latencia → Min: {minimo} ms | Max: {maximo} ms | Promedio: {promedio} ms")
 
         disponible = 1 if resultado.returncode == 0 else 0
 
-        return (fecha_ping, minimo, maximo, promedio, perdidos, disponible, enviados, recibidos)
+        return (fecha_ping, minimo, maximo, promedio, perdidos, disponible, enviados, recibidos, porcentaje)
 
     except Exception as e:
         print("Error:", e)

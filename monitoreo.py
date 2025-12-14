@@ -21,7 +21,7 @@ INTERVALO_MINUTOS = 5
 #while True:
 print("\n--- Iniciando monitoreo ---")
 
-    #Almacenar direccion ip y mac de la funcion obtener_ips de db_utils
+#Almacenar direccion ip y mac de la funcion obtener_ips de db_utils
 dispositivos = obtener_ips(conexion)
 #Almacenar la tabla arp de arp_controlador
 arp = obtener_tabla_arp()
@@ -32,7 +32,7 @@ for id_dispositivo, macadd, ip_actual in dispositivos:
         print(f"\nAnalizando →{ip_actual}")
 
         # Realiza un ping 
-        fecha_ping, minimo, maximo, promedio, perdidos, disponible, enviados, recibidos = ping(ip_actual)
+        fecha_ping, minimo, maximo, promedio, perdidos, disponible, enviados, recibidos, porcentaje = ping(ip_actual)
         
         # Busca en la tabla arp la mac y verifica si cambio la ip
         nueva_ip = buscar_ip(arp, macadd)
@@ -45,9 +45,9 @@ for id_dispositivo, macadd, ip_actual in dispositivos:
             ip_actual = nueva_ip
 
         # Insertar en los datos de latencia, disponibilidad y perdida de paquetes en la base de datos
-        insertar_metricas(conexion, id_dispositivo, fecha_ping, promedio, perdidos, disponible)
+        insertar_metricas(conexion, id_dispositivo, fecha_ping, promedio, porcentaje, disponible)
         
-        evaluar_metricas(conexion, id_dispositivo, fecha_ping, promedio, perdidos, disponible)
+        evaluar_metricas(conexion, id_dispositivo, fecha_ping, promedio, porcentaje, disponible)
 
         #print(f"⏳ Esperando {INTERVALO_MINUTOS} minutos...")
         

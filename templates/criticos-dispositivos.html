@@ -23,28 +23,34 @@
                         {% endif %}
                         {% endwith %}
 
-                    {% for e in ueventos %}
+                    {% for dc in dcriticos %}
                     <!-- Tarjetas de eventos -->
                    <div class="row">
                    <div class="col-12 mb-2">
                    <div class="card shadow h-100 py-2">
-                     <a href="/eliminar/evento/{{ e[0] }}" class="position-absolute" style="top: 20px; right: 40px;">
+                     <a href="/eliminar/evento/{{ dc[0] }}" class="position-absolute" style="top: 20px; right: 40px;">
     <i class="fas fa-trash-alt" style="color: #c10606;"></i>
   </a>
                     <div class="card-body d-flex justify-content-between align-items-center">
                         <div class="text-left">
                         
-                        <h6 class="m-0 font-weight-bold text-primary">{{ e[2] }}</h6> 
-                        <p class="card-text">Fecha: {{ e[8] }}
-                        <br>{{ e[7] }}
-                        <br>Ubicación: {{ e[5] }}
+                        <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-times-circle" style="color: #f00000;"></i> {{ dc[2] }}</h6> 
+                        <p class="card-text">Fecha: {{ dc[8] }}
+                        <br>{{ dc[7] }}
+                        <br>Ubicación: {{ dc[5] }}
                         </p>
                         </div>
                     </div>
-                    
+
                     </div>
                     </div>
                     </div>
+                    {% else %}
+                           <div class="d-flex justify-content-center align-items-center">
+                            <i class="fas fa-search fa-2x me-2" style="color: #5881a7ff;"> </i>
+                            <p class="fw-bold mb-0 mensaje_ne"> No se encontraron dispositivos críticos</p>    
+                        </div>
+                            
 {% endfor %}
 
                     

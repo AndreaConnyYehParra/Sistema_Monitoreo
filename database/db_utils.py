@@ -74,6 +74,7 @@ def actualizar_dispositivo(conexion, _nombre, _macadd, _ip_actual, _tipo, _ubica
 
 def eliminar_dispositivo(conexion,  id):
         cursor=conexion.connection.cursor()
+        cursor.execute("DELETE FROM evento WHERE id_dispositivo_fk=%s",(id,))
         cursor.execute("DELETE FROM metricas WHERE id_dispositivo_fk = %s", (id,))
         cursor.execute("DELETE FROM dispositivo WHERE id_dispositivo=%s",(id,))
         conexion.connection.commit()
@@ -191,3 +192,134 @@ def eliminar_eventos(conexion):
      cursor.execute("DELETE FROM evento")
      conexion.connection.commit()
      cursor.close()
+
+def obtener_todos_eventos(conexion):
+    cursor = conexion.connection.cursor()
+    cursor.execute("""
+        SELECT e.id_eveto,e.id_dispositivo_fk,d.nombre_dispositivo,d.mac_address,d.ip_actual,u.ubicacion,e.tipo_alerta,e.descripcion,e.fecha
+        FROM evento AS e
+        INNER JOIN dispositivo AS d
+            ON e.id_dispositivo_fk = d.id_dispositivo
+        INNER JOIN ubicacion AS u
+            ON d.id_ubicacion_fk = u.id_ubicacion
+        ORDER BY e.id_eveto DESC;
+    """)
+    todos_eventos = cursor.fetchall()
+    cursor.close()
+    return todos_eventos
+
+def obtener_disponibilidad(conexion):
+    cursor = conexion.connection.cursor()
+    cursor.execute("""
+    SELECT 
+    SUM(CASE WHEN m.disponibilidad = 1 THEN 1 ELSE 0 END) AS disponibles,
+    SUM(CASE WHEN m.disponibilidad = 0 THEN 1 ELSE 0 END) AS no_disponibles
+    FROM metricas AS m
+    WHERE m.fecha = (
+    SELECT MAX(m2.fecha)
+    FROM metricas AS m2
+    WHERE m2.id_dispositivo_fk = m.id_dispositivo_fk
+    );
+    """)
+    disponibilidad = cursor.fetchall()
+    cursor.close()
+    return disponibilidad
+
+def obtener_umonitoreo(conexion):
+    cursor = conexion.connection.cursor()
+    cursor.execute("""
+    SELECT MAX(fecha) AS ultima_monitoreo
+    FROM metricas;
+    """)
+    ultimo_monitoreo = cursor.fetchone()
+    cursor.close()
+    return ultimo_monitoreo[0]
+
+def obtener_deventos(conexion):
+    cursor = conexion.connection.cursor()
+    cursor.execute("""
+        SELECT e.id_eveto, e.id_dispositivo_fk, e.tipo_alerta, e.descripcion, e.fecha, d.nombre_dispositivo
+        FROM evento AS e
+        INNER JOIN dispositivo AS d
+        ON e.id_dispositivo_fk= d.id_dispositivo
+        ORDER BY id_eveto DESC
+        LIMIT 6;
+    """)
+    ultimos_deventos = cursor.fetchall()
+    cursor.close()
+    return ultimos_deventos
+
+def obtener_ndispositivos(conexion):
+     cursor = conexion.connection.cursor()
+     cursor.execute("""
+        SELECT COUNT(*) AS total_dispositivos
+        FROM dispositivo;
+        """)
+     resultado = cursor.fetchone()
+     cursor.close()
+     return  resultado[0]
+            
+            
+def obtener_disnormal(conexion):
+    cursor = conexion.connection.cursor()
+    cursor.execute("""
+    SELECT COUNT(*) AS normal
+    FROM (
+        SELECT e.tipo_alerta
+        FROM evento e
+        INNER JOIN (
+            SELECT id_dispositivo_fk, MAX(fecha) AS ultima_fecha
+            FROM evento
+            GROUP BY id_dispositivo_fk
+        ) ult
+        ON e.id_dispositivo_fk = ult.id_dispositivo_fk
+        AND e.fecha = ult.ultima_fecha
+    ) AS ultimos
+    WHERE tipo_alerta = 'Estado Normal';
+    """)
+    dis_normal = cursor.fetchone()
+    cursor.close()
+    return dis_normal[0]
+
+def obtener_discriticos(conexion):
+    cursor = conexion.connection.cursor()
+    cursor.execute("""
+    SELECT COUNT(*) AS criticos
+    FROM (
+        SELECT e.tipo_alerta
+        FROM evento e
+        INNER JOIN (
+            SELECT id_dispositivo_fk, MAX(fecha) AS ultima_fecha
+            FROM evento
+            GROUP BY id_dispositivo_fk
+        ) ult
+        ON e.id_dispositivo_fk = ult.id_dispositivo_fk
+        AND e.fecha = ult.ultima_fecha
+    ) AS ultimos
+    WHERE tipo_alerta = 'Estado Crítico';
+    """)
+    dis_criticos = cursor.fetchone()
+    cursor.close()
+    return dis_criticos[0]
+
+def obtener_disadvertencia(conexion):
+    cursor = conexion.connection.cursor()
+    cursor.execute("""
+    SELECT COUNT(*) AS advertencia
+    FROM (
+        SELECT e.tipo_alerta
+        FROM evento e
+        INNER JOIN (
+            SELECT id_dispositivo_fk, MAX(fecha) AS ultima_fecha
+            FROM evento
+            GROUP BY id_dispositivo_fk
+        ) ult
+        ON e.id_dispositivo_fk = ult.id_dispositivo_fk
+        AND e.fecha = ult.ultima_fecha
+    ) AS ultimos
+    WHERE tipo_alerta = 'Advertencia';
+    """)
+    dis_advertencia = cursor.fetchone()
+    cursor.close()
+    return dis_advertencia[0]
+ 
