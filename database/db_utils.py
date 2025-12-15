@@ -221,9 +221,10 @@ def obtener_disponibilidad(conexion):
     WHERE m2.id_dispositivo_fk = m.id_dispositivo_fk
     );
     """)
-    disponibilidad = cursor.fetchall()
+    disponibilidad = cursor.fetchone()
+    activos, inactivos = disponibilidad
     cursor.close()
-    return disponibilidad
+    return activos, inactivos
 
 def obtener_umonitoreo(conexion):
     cursor = conexion.connection.cursor()
@@ -322,4 +323,94 @@ def obtener_disadvertencia(conexion):
     dis_advertencia = cursor.fetchone()
     cursor.close()
     return dis_advertencia[0]
+
+def obtener_promedios(conexion):
+    cursor = conexion.connection.cursor()
+    cursor.execute("""
+                SELECT 
+                t.tipo_dispositivo AS tipo,
+                AVG(m.latencia) AS latencia_promedio,
+                AVG(m.paquetes_perdidos) AS perdida_promedio
+            FROM (
+                SELECT m.*
+                FROM metricas m
+                INNER JOIN (
+                    SELECT id_dispositivo_fk, MAX(fecha) AS ultima_fecha
+                    FROM metricas
+                    GROUP BY id_dispositivo_fk
+                ) ult
+                    ON m.id_dispositivo_fk = ult.id_dispositivo_fk
+                    AND m.fecha = ult.ultima_fecha
+            ) m
+            INNER JOIN dispositivo d
+                ON m.id_dispositivo_fk = d.id_dispositivo
+            INNER JOIN tipo t
+                ON d.id_tipo_fk = t.id_tipo
+            GROUP BY t.tipo_dispositivo;
+    """)
+    resultados = cursor.fetchall()
+    cursor.close()
+    return resultados  
+
+def obtener_top_latencia(conexion):
+    cursor = conexion.connection.cursor()
+    cursor.execute("""
+                SELECT 
+                    d.nombre_dispositivo AS dispositivo,
+                    t.tipo_dispositivo AS tipo,
+                    m.latencia
+                FROM (
+                    SELECT m.*
+                    FROM metricas m
+                    INNER JOIN (
+                        SELECT id_dispositivo_fk, MAX(fecha) AS ultima_fecha
+                        FROM metricas
+                        GROUP BY id_dispositivo_fk
+                    ) ult
+                        ON m.id_dispositivo_fk = ult.id_dispositivo_fk
+                        AND m.fecha = ult.ultima_fecha
+                ) m
+                INNER JOIN dispositivo d
+                    ON m.id_dispositivo_fk = d.id_dispositivo
+                INNER JOIN tipo t
+                    ON d.id_tipo_fk = t.id_tipo
+                ORDER BY m.latencia DESC
+                LIMIT 5;
+    """)
+    top_latencia = cursor.fetchall()
+    cursor.close()
+    return top_latencia
+
+def obtener_top_perdidas(conexion):
+    cursor = conexion.connection.cursor()
+    cursor.execute("""
+                SELECT 
+                    d.nombre_dispositivo AS dispositivo,
+                    t.tipo_dispositivo AS tipo,
+                    m.paquetes_perdidos
+                FROM (
+                    SELECT m.*
+                    FROM metricas m
+                    INNER JOIN (
+                        SELECT id_dispositivo_fk, MAX(fecha) AS ultima_fecha
+                        FROM metricas
+                        GROUP BY id_dispositivo_fk
+                    ) ult
+                        ON m.id_dispositivo_fk = ult.id_dispositivo_fk
+                        AND m.fecha = ult.ultima_fecha
+                ) m
+                INNER JOIN dispositivo d
+                    ON m.id_dispositivo_fk = d.id_dispositivo
+                INNER JOIN tipo t
+                    ON d.id_tipo_fk = t.id_tipo
+                ORDER BY m.paquetes_perdidos DESC
+                LIMIT 5;
+    """)
+    top_perdidas = cursor.fetchall()
+    cursor.close()
+    return top_perdidas  
+ 
+ 
+ 
+
  

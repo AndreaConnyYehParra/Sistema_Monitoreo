@@ -1,8 +1,10 @@
 from flask import Flask, render_template, request, jsonify, redirect, flash, session
 from flask_mysqldb import MySQL
 from database.config import Config
-from  database.db_utils import obtener_tipos, obtener_ubicaciones, obtener_dispositivos, insertar_dispositivo, actualizar_dispositivo, eliminar_dispositivo, obtener_dispositivos_card, filtros, obtener_eventos, obtener_ultimos_eventos, obtener_dispositivos_criticos, eliminar_evento_db, eliminar_eventos, obtener_todos_eventos,obtener_disponibilidad, obtener_umonitoreo, obtener_deventos, obtener_ndispositivos, obtener_disnormal, obtener_disadvertencia, obtener_discriticos
-from  servicio.evaluar_salud import evaluar_salud
+from  database.db_utils import obtener_tipos, obtener_ubicaciones, obtener_dispositivos, insertar_dispositivo, actualizar_dispositivo, eliminar_dispositivo, obtener_dispositivos_card, filtros, obtener_eventos, obtener_ultimos_eventos, obtener_dispositivos_criticos, eliminar_evento_db, eliminar_eventos, obtener_todos_eventos,obtener_disponibilidad, obtener_umonitoreo, obtener_deventos, obtener_ndispositivos, obtener_disnormal, obtener_disadvertencia, obtener_discriticos, obtener_promedios, obtener_top_latencia, obtener_top_perdidas
+from  servicio.evaluar_salud import evaluar_salud, evaluar_disponibilidad
+import threading
+import monitoreo
 
 app=Flask(__name__)
 
@@ -18,15 +20,22 @@ app.secret_key = "890HJK"
 @app.route('/')
 def index():
     ultimos_eventos=obtener_ultimos_eventos(conexion)
-    disponibilidad=obtener_disponibilidad(conexion)
+    activos, inactivos=obtener_disponibilidad(conexion)
     umonitoreo=obtener_umonitoreo(conexion)
     ultimo_deventos=obtener_deventos(conexion)
     num_dispositivos = obtener_ndispositivos(conexion) 
     dis_normal = obtener_disnormal(conexion)
     dis_advertencia = obtener_disadvertencia(conexion)
     dis_criticos = obtener_discriticos(conexion)
-    porcentaje_salud, salud_general = evaluar_salud(num_dispositivos, dis_criticos, dis_advertencia, dis_normal)
-    return render_template('index.html', ueventos=ultimos_eventos, disponibilidad=disponibilidad, umonitoreo=umonitoreo, ultimo_deventos=ultimo_deventos, porcentaje_salud=porcentaje_salud, salud_general=salud_general) 
+    porcentaje_salud, salud_general, pct_criticos, pct_advertencias, pct_normales = evaluar_salud(num_dispositivos, dis_criticos, dis_advertencia, dis_normal)
+    pct_disponibilidad, pct_nodisponibilidad = evaluar_disponibilidad(num_dispositivos, activos)
+    promedios = obtener_promedios(conexion)
+    tipos = [fila[0] for fila in promedios]
+    latencias = [fila[1] for fila in promedios]
+    perdidas = [fila[2] for fila in promedios]
+    top_latencias = obtener_top_latencia(conexion)
+    top_perdidas = obtener_top_perdidas(conexion)
+    return render_template('index.html', ueventos=ultimos_eventos, activos=activos, inactivos=inactivos, umonitoreo=umonitoreo, ultimo_deventos=ultimo_deventos, porcentaje_salud=porcentaje_salud, salud_general=salud_general, pct_criticos=pct_criticos, pct_advertencias=pct_advertencias, pct_normales=pct_normales, pct_disponibilidad=pct_disponibilidad, pct_nodisponibilidad=pct_nodisponibilidad, tipos=tipos, latencias=latencias, perdidas=perdidas, top_latencias=top_latencias, top_perdidas=top_perdidas) 
 
 
 @app.route('/admin/dispositivos')
@@ -149,8 +158,15 @@ def eliminar_todos_eventos():
     except Exception as ex:
         flash("Error al eliminar eventos", "danger")
         return redirect('/eventos/dispositivos')
-
+    
+def iniciar_monitoreo():
+    monitoreo.iniciar() 
+    
 if __name__=='__main__':
+    hilo = threading.Thread(target=iniciar_monitoreo)
+    hilo.daemon = True
+    hilo.start()
     app.run(debug=True)
+    
     
     
