@@ -161,7 +161,7 @@ def iniciar_monitoreo():
     monitoreo.iniciar() 
     
 if __name__=='__main__':
-    #hilo = threading.Thread(target=iniciar_monitoreo)
-    #hilo.daemon = True
-    #hilo.start()
+    hilo = threading.Thread(target=iniciar_monitoreo)
+    hilo.daemon = True
+    hilo.start()
     app.run(debug=True, use_reloader=False)
