@@ -11,7 +11,7 @@ def evaluar_latencia(latencia):
             estado_latencia="Advertencia"
         else: 
             estado_latencia="Crítico"
-        return estado_latencia
+        return estado_latencia 
         
 def evaluar_paquetes(porcentaje):
         try: perdidos = int(porcentaje)
@@ -26,7 +26,7 @@ def evaluar_paquetes(porcentaje):
         if porcentaje == 0:
          return "Normal"
 
-    # Si viene algo inesperado, lo tratamos como crítico
+    # Si llega algo inesperado, lo tratamos como crítico
         return "Crítico"
             
 def evaluar_disponibilidad(disponible):

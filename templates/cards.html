@@ -2,15 +2,15 @@
                     <div class="col-md-3 mb-4">
                     <div class="card shadow h-100 py-2" style="width: 17rem;">
                     <div class="card-body">
-                        <h5 class="card-title text-primary">{% if d[7] == 1 %}<i class="fas fa-circle fa-xs" style="color: #06db1e;"></i> {% else %} <i class="fas fa-circle fa-xs" style="color: #db1b06;"></i> {% endif %}{{ d[2] }}</h5>
-                        <p class="card-text">Dirección IP: {{ d[4] }}
-                            <br>Estado: {% if d[7] == 0 %}<i class="fas fa-times-circle" style="color: #f00000;"></i> Crítico
-                    {% elif d[6] >=50  or d[5] > 100 %}<i class="fas fa-times-circle" style="color: #f00000;"></i> Critico
-                    {% elif d[6] == 25  or (50 <= d[5] <= 100) %}<i class="fas fa-exclamation-circle" style="color: #FFD43B;"></i> Advertencia
+                        <h5 class="card-title text-primary">{% if d[6] == 1 %}<i class="fas fa-circle fa-xs" style="color: #06db1e;"></i> {% else %} <i class="fas fa-circle fa-xs" style="color: #db1b06;"></i> {% endif %}{{ d[2] }}</h5>
+                        <p class="card-text">Dirección IP: {{ d[3] }}
+                            <br>Estado: {% if d[6] == 0 %}<i class="fas fa-times-circle" style="color: #f00000;"></i> Crítico
+                    {% elif d[5] >=50  or d[4] > 100 %}<i class="fas fa-times-circle" style="color: #f00000;"></i> Critico
+                    {% elif d[5] == 25  or (50 <= d[4] <= 100) %}<i class="fas fa-exclamation-circle" style="color: #FFD43B;"></i> Advertencia
                     {% else %}<i class="fas fa-check-circle" style="color: #07bb4c;"></i></i> Funcionando correctamente{% endif %} 
-                            <br>Latencia: {{ d[5] }} ms
-                            <br>Paquetes perdidos: {{ d[6] }} %
-                            <br>Ultimo monitoreo: {{ d[8] }}
+                            <br>Latencia: {{ d[4] }} ms
+                            <br>Paquetes perdidos: {{ d[5] }} %
+                            <br>Ultimo monitoreo: {{ d[7] }}
                         </p>
                         <a href="#" class="btn btn-sm btn-primary text" data-toggle="modal" data-target="#modalverDispositivo{{ d[0] }}">Ver detalles</a>
                     </div>
@@ -24,7 +24,7 @@
                     <div class="modal-content">
 
                         <div class="modal-header">
-                            <h5 class="modal-title text-primary text-center w-100">{% if d[7] == 1 %}<i class="fas fa-circle fa-xs" style="color: #06db1e;"></i> {% else %} <i class="fas fa-circle fa-xs" style="color: #db1b06;"></i> {% endif %}{{ d[2] }}</h5>
+                            <h5 class="modal-title text-primary text-center w-100">{% if d[6] == 1 %}<i class="fas fa-circle fa-xs" style="color: #06db1e;"></i> {% else %} <i class="fas fa-circle fa-xs" style="color: #db1b06;"></i> {% endif %}{{ d[2] }}</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -36,7 +36,7 @@
 
                       <div class="d-flex">
                         <label class="text-primary" for="ip"><i class="fas fa-clock" style="color: #1f8fe5;"></i> Ultimo monitoreo: </label>
-                        <p class="form-control-static pdis">{{ d[8] }}</p>
+                        <p class="form-control-static pdis">{{ d[7] }}</p>
                     </div>
 
                     <div class="d-flex">
@@ -44,38 +44,34 @@
                         <p class="form-control-static pdis">{{ d[2] }}</p>
                     </div>
 
-                    <div class="d-flex">
-                        <label class="text-labels" for="macadd">Mac Address: </label>
-                        <p class="form-control-static pdis">{{ d[3] }}</p>
-                    </div>
 
                     <div class="d-flex">
                         <label class="text-labels" for="ip">IP: </label>
-                        <p class="form-control-static pdis">{{ d[4] }}</p>
+                        <p class="form-control-static pdis">{{ d[3] }}</p>
                     </div>
 
                     <div class="">
                         <label for="ip" class="text-primary"> 
-                    {% if d[7] == 0 %}<i class="fas fa-times-circle" style="color: #f00000;"></i>
-                    {% elif d[6] >=50  or d[5] > 100 %}<i class="fas fa-times-circle" style="color: #f00000;"></i>
-                    {% elif d[6] == 25  or (50 <= d[5] <= 100) %}<i class="fas fa-exclamation-circle" style="color: #FFD43B;"></i>
+                    {% if d[6] == 0 %}<i class="fas fa-times-circle" style="color: #f00000;"></i>
+                    {% elif d[5] >=50  or d[4] > 100 %}<i class="fas fa-times-circle" style="color: #f00000;"></i>
+                    {% elif d[5] == 25  or (50 <= d[4] <= 100) %}<i class="fas fa-exclamation-circle" style="color: #FFD43B;"></i>
                     {% else %}<i class="fas fa-check-circle" style="color: #07bb4c;"></i></i>{% endif %} 
                          Estado de Salud </label>
                     </div>
 
                     <div class="d-flex">
                         <label class="text-labels" for="ip">Latencia: </label>
-                        <p class="form-control-static pdis">{{ d[5] }} ms</p>
+                        <p class="form-control-static pdis">{{ d[4] }} ms</p>
                     </div>
 
                     <div class="d-flex">
                         <label class="text-labels" for="ip" class="me-2">Paquetes Perdidos: </label>
-                        <p class="form-control-static pdis">{{ d[6] }} %</p>
+                        <p class="form-control-static pdis">{{ d[5] }} %</p>
                     </div>
 
                     <div class="d-flex">
                         <label class="text-labels" for="ip">Disponibilidad: </label>
-                        <p class="form-control-static pdis">{% if d[7] == 1 %}Disponible{% else %}No disponible{% endif %}</p>
+                        <p class="form-control-static pdis">{% if d[6] == 1 %}Disponible{% else %}No disponible{% endif %}</p>
                     </div>
 
                     <div class="">

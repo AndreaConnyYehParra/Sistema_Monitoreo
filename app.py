@@ -78,13 +78,12 @@ def CriticosDispositivos():
 def storage():
     
     _nombre=request.form['nombre']
-    _macadd=request.form['macadd']
     _ip_actual=request.form['ip']
     _tipo=request.form['tipo']
     _ubicacion=request.form['ubicacion']
         
     try: 
-        insertar_dispositivo(conexion, _nombre, _macadd, _ip_actual, _tipo, _ubicacion)
+        insertar_dispositivo(conexion, _nombre, _ip_actual, _tipo, _ubicacion)
         flash("Dispositivo agregado correctamente", "success")
         return redirect('/admin/dispositivos')
     except Exception as ex:
@@ -94,14 +93,13 @@ def storage():
 @app.route('/editar/dispositivo', methods=['POST'])
 def editar():       
     _nombre=request.form['nombre']
-    _macadd=request.form['macadd']
     _ip_actual=request.form['ip']
     _tipo=request.form['tipo']
     _ubicacion=request.form['ubicacion']
     _id=request.form['id']
         
     try: 
-        actualizar_dispositivo(conexion, _nombre, _macadd, _ip_actual, _tipo, _ubicacion,_id)
+        actualizar_dispositivo(conexion, _nombre, _ip_actual, _tipo, _ubicacion,_id)
         flash("Dispositivo Editado Correctamente", "primary")
         return redirect('/admin/dispositivos')
     except Exception as ex:
@@ -163,10 +161,7 @@ def iniciar_monitoreo():
     monitoreo.iniciar() 
     
 if __name__=='__main__':
-    hilo = threading.Thread(target=iniciar_monitoreo)
-    hilo.daemon = True
-    hilo.start()
-    app.run(debug=True)
-    
-    
-    
+    #hilo = threading.Thread(target=iniciar_monitoreo)
+    #hilo.daemon = True
+    #hilo.start()
+    app.run(debug=True, use_reloader=False)

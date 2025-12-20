@@ -1,7 +1,6 @@
 import time
 from database.db_utils import obtener_ips, actualizar_ip, insertar_metricas
 from servicio.ping_controlador import ping
-from servicio.arp_controlador import obtener_tabla_arp, buscar_ip
 from servicio.evaluar_metricas import evaluar_metricas
 
 import MySQLdb
@@ -16,38 +15,28 @@ conexion = MySQLdb.connect(
     )
 
 def iniciar():
+    
     INTERVALO_MINUTOS = 10 
 
     while True:
 
          print("\n--- Iniciando monitoreo ---")
-         #Almacenar direccion ip y mac de la funcion obtener_ips de db_utils
+
          dispositivos = obtener_ips(conexion)
-         #Almacenar la tabla arp de arp_controlador
-         arp = obtener_tabla_arp()
-         print(arp)
+ 
                     
-         for id_dispositivo, macadd, ip_actual in dispositivos:
+         for id_dispositivo, ip_actual in dispositivos:
 
              print(f"\nAnalizando →{ip_actual}")
 
-             # Realiza un ping 
+             # Guarda en variables los resultados del ping
              fecha_ping, minimo, maximo, promedio, perdidos, disponible, enviados, recibidos, porcentaje = ping(ip_actual)
-                        
-             # Busca en la tabla arp la mac y verifica si cambio la ip
-             nueva_ip = buscar_ip(arp, macadd)
-             print(f"Nueva ip: {nueva_ip}")
-
-             #Si la nueva ip es diferente de la ip_actual, actualizar la ip en la base de datos
-             if nueva_ip and nueva_ip != ip_actual:
-                  print(f"IP nueva detectada: {ip_actual} → {nueva_ip}")
-                  actualizar_ip(conexion, id_dispositivo, nueva_ip)
-                  ip_actual = nueva_ip
-
-                        # Insertar en los datos de latencia, disponibilidad y perdida de paquetes en la base de datos
+             
+             # Llamada a la función que inserta los valores de la métricas en la base de datos
              insertar_metricas(conexion, id_dispositivo, fecha_ping, promedio, porcentaje, disponible)
-                        
+             
+            # Llamada a la función que evalúa las métricas para determinar el estado del dispositivo
              evaluar_metricas(conexion, id_dispositivo, fecha_ping, promedio, porcentaje, disponible)
 
-         print(f"Esperando {INTERVALO_MINUTOS} minutos...")
+         print(f"El proximo monitoreo se realizara en {INTERVALO_MINUTOS} minutos...")
          time.sleep(INTERVALO_MINUTOS * 60)

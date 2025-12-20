@@ -15,7 +15,7 @@ def obtener_ubicaciones(conexion):
 
 def obtener_dispositivos(conexion):
      cursor = conexion.connection.cursor()
-     cursor.execute("""SELECT d.id_dispositivo, d.nombre_dispositivo,d.mac_address,d.ip_actual,t.tipo_dispositivo,u.ubicacion 
+     cursor.execute("""SELECT d.id_dispositivo, d.nombre_dispositivo,d.ip_actual,t.tipo_dispositivo,u.ubicacion 
                     FROM dispositivo AS d
                     INNER JOIN tipo AS t
                     ON d.id_tipo_fk = t.id_tipo
@@ -29,7 +29,7 @@ def obtener_dispositivos(conexion):
 def obtener_dispositivos_card(conexion, ubicacion):
     cursor = conexion.connection.cursor()
     if ubicacion==0:
-        cursor.execute("""SELECT m.id_metrica, m.id_dispositivo_fk, d.nombre_dispositivo, d.mac_address, d.ip_actual,
+        cursor.execute("""SELECT m.id_metrica, m.id_dispositivo_fk, d.nombre_dispositivo, d.ip_actual,
                     m.latencia, m.paquetes_perdidos, m.disponibilidad, m.fecha
                     FROM metricas AS m
                     INNER JOIN dispositivo AS d
@@ -42,7 +42,7 @@ def obtener_dispositivos_card(conexion, ubicacion):
         cursor.close()
         return dispositivos
     else:
-        cursor.execute("""SELECT m.id_metrica, m.id_dispositivo_fk, d.nombre_dispositivo, d.mac_address, d.ip_actual,
+        cursor.execute("""SELECT m.id_metrica, m.id_dispositivo_fk, d.nombre_dispositivo, d.ip_actual,
                     m.latencia, m.paquetes_perdidos, m.disponibilidad, m.fecha, d.id_ubicacion_fk
                     FROM metricas AS m
                     INNER JOIN dispositivo AS d
@@ -56,18 +56,18 @@ def obtener_dispositivos_card(conexion, ubicacion):
         return dispositivos
 
 
-def insertar_dispositivo(conexion, _nombre, _macadd, _ip_actual, _tipo, _ubicacion):
+def insertar_dispositivo(conexion, _nombre, _ip_actual, _tipo, _ubicacion):
         cursor=conexion.connection.cursor()
-        sql="INSERT INTO dispositivo (nombre_dispositivo,mac_address,ip_actual,id_tipo_fk,id_ubicacion_fk) VALUES (%s, %s, %s, %s, %s);"
-        datos = (_nombre, _macadd, _ip_actual, _tipo, _ubicacion)
+        sql="INSERT INTO dispositivo (nombre_dispositivo,ip_actual,id_tipo_fk,id_ubicacion_fk) VALUES (%s, %s, %s, %s);"
+        datos = (_nombre, _ip_actual, _tipo, _ubicacion)
         cursor.execute(sql,datos)
         conexion.connection.commit()
         cursor.close()
 
-def actualizar_dispositivo(conexion, _nombre, _macadd, _ip_actual, _tipo, _ubicacion, _id):
+def actualizar_dispositivo(conexion, _nombre, _ip_actual, _tipo, _ubicacion, _id):
         cursor=conexion.connection.cursor()
-        sql="UPDATE dispositivo SET nombre_dispositivo=%s,mac_address=%s,ip_actual=%s,id_tipo_fk=%s,id_ubicacion_fk=%s WHERE id_dispositivo=%s;"
-        datos = (_nombre, _macadd, _ip_actual, _tipo, _ubicacion, _id)
+        sql="UPDATE dispositivo SET nombre_dispositivo=%s,ip_actual=%s,id_tipo_fk=%s,id_ubicacion_fk=%s WHERE id_dispositivo=%s;"
+        datos = (_nombre, _ip_actual, _tipo, _ubicacion, _id)
         cursor.execute(sql,datos)
         conexion.connection.commit()
         cursor.close()
@@ -83,7 +83,7 @@ def eliminar_dispositivo(conexion,  id):
         
 def obtener_ips(conexion):
         cursor=conexion.cursor()
-        cursor.execute("SELECT id_dispositivo, mac_address, ip_actual FROM dispositivo")
+        cursor.execute("SELECT id_dispositivo, ip_actual FROM dispositivo")
         ip = cursor.fetchall()
         cursor.close()
         return ip
@@ -114,7 +114,7 @@ def insertar_evento(conexion,id_dispositivo,alerta,descripcion,fecha):
 def filtros(conexion, ubicacion):
     cursor = conexion.connection.cursor()
     if ubicacion==0:
-        cursor.execute("""SELECT d.id_dispositivo, d.nombre_dispositivo,d.mac_address,d.ip_actual,t.tipo_dispositivo,u.ubicacion 
+        cursor.execute("""SELECT d.id_dispositivo, d.nombre_dispositivo,d.ip_actual,t.tipo_dispositivo,u.ubicacion 
                     FROM dispositivo AS d
                     INNER JOIN tipo AS t
                     ON d.id_tipo_fk = t.id_tipo
@@ -125,7 +125,7 @@ def filtros(conexion, ubicacion):
         cursor.close()
         return dispositivos
     else: 
-        cursor.execute("""SELECT d.id_dispositivo, d.nombre_dispositivo,d.mac_address,d.ip_actual,t.tipo_dispositivo,u.ubicacion 
+        cursor.execute("""SELECT d.id_dispositivo, d.nombre_dispositivo,d.ip_actual,t.tipo_dispositivo,u.ubicacion 
                     FROM dispositivo AS d
                     INNER JOIN tipo AS t
                     ON d.id_tipo_fk = t.id_tipo
@@ -168,7 +168,7 @@ def obtener_dispositivos_criticos(conexion):
     cursor = conexion.connection.cursor()
     cursor.execute("""
         SELECT e.id_eveto,
-        e.id_dispositivo_fk,d.nombre_dispositivo,d.mac_address,d.ip_actual,u.ubicacion,e.tipo_alerta,e.descripcion,e.fecha
+        e.id_dispositivo_fk,d.nombre_dispositivo,d.ip_actual,u.ubicacion,e.tipo_alerta,e.descripcion,e.fecha
         FROM evento AS e
         INNER JOIN dispositivo AS d
             ON e.id_dispositivo_fk = d.id_dispositivo
@@ -196,7 +196,7 @@ def eliminar_eventos(conexion):
 def obtener_todos_eventos(conexion):
     cursor = conexion.connection.cursor()
     cursor.execute("""
-        SELECT e.id_eveto,e.id_dispositivo_fk,d.nombre_dispositivo,d.mac_address,d.ip_actual,u.ubicacion,e.tipo_alerta,e.descripcion,e.fecha
+        SELECT e.id_eveto,e.id_dispositivo_fk,d.nombre_dispositivo,d.ip_actual,u.ubicacion,e.tipo_alerta,e.descripcion,e.fecha
         FROM evento AS e
         INNER JOIN dispositivo AS d
             ON e.id_dispositivo_fk = d.id_dispositivo
